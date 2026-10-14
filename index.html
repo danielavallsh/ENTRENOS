@@ -445,9 +445,8 @@ function vHoy(){
     <div class="kicker">${run.plan?'Tu plan · entreno '+run.cod:'Sesión'}</div>
     <h3>${run.nombre}</h3><p>${run.sub}</p>
     <div class="meta"><span class="pill">⏱ ${runMin(run)} min</span><span class="pill">Hasta Z${Math.max(...run.seg.map(s=>s[2]))}</span></div>
-    <div class="row"><button class="btn white" onclick="startRun('${run.id}')">${icoPlay(16)} Guiada</button><button class="btn ghostw" onclick="openLog({tipo:'correr',ref:'${run.id}'})">Solo registrar</button></div>
+    <div class="row"><button class="btn white" onclick="doneRun('${run.id}')">✓ Hecho</button><button class="btn ghostw" onclick="openRun('${run.id}')">Ver entreno</button></div>
   </div>
-  <button class="btn block" style="margin-top:4px" onclick="openLog({tipo:'correr',ref:'libre',min:30})">＋ Registrar carrera libre</button>
   <h2>Consejo</h2>
   <div class="card tip"><div class="ic">💡</div><div class="small">${tipDelDia()}</div></div>`;
 }
@@ -505,12 +504,11 @@ function vCorrer(){
     <div class="row between" style="margin-bottom:4px"><span class="bold">Tus zonas</span><button class="btn sm" onclick="go('ajustes')">Ajustar</button></div>
     ${Z.map((z,i)=>`<div class="z"><div class="zb" style="background:${zc(i+1)}">Z${i+1}</div><div class="grow small muted">${rango(i+1,i+1).pace} min/km</div><div class="zr">${z[0]}–${z[1]}</div></div>`).join('')}
   </div>
-  <div class="card small muted"><b style="color:var(--text)">Cómo usarlo:</b> haz los entrenos de tu plan en orden y, al acabar el último, vuelve a empezar; la app marca cuál toca. Los días que solo te apetezca rodar, registra una carrera libre. Intensidad 0 = trote muy suave o andando.</div>
+  <div class="card small muted"><b style="color:var(--text)">Cómo usarlo:</b> haz los entrenos de tu plan en orden con tu reloj y, al volver, pulsa <b>Hecho</b>. La app pasa al siguiente y, al acabar el último, vuelve a empezar.</div>
   <h2>Tu plan</h2>
   ${RUN.filter(s=>s.plan).map(s=>runCard(s,sug)).join('')}
   <h2>Sesiones extra</h2>
-  ${RUN.filter(s=>!s.plan).map(s=>runCard(s,sug)).join('')}
-  <button class="btn block" onclick="openLog({tipo:'correr',ref:'libre',min:30})">＋ Registrar carrera libre</button>`;
+  ${RUN.filter(s=>!s.plan).map(s=>runCard(s,sug)).join('')}`;
 }
 
 function vProgreso(){
@@ -607,7 +605,7 @@ function vAjustes(){
     <input type="file" id="imp" accept="application/json,.json" class="hidden" onchange="importData(this.files[0])">
     <button class="btn danger block" style="margin-top:12px" onclick="resetAll()">Borrar todos los datos</button>
   </div>
-  <p class="tiny muted" style="text-align:center">Entrenos · v1</p>`;
+  <p class="tiny muted" style="text-align:center">Entrenos · v2</p>`;
 }
 function setS(k,v){ S.settings[k]=v; if(k==='custom'&&v&&!S.settings.zonas){ S.settings.zonas=zonasCalc(); } save(); render(); }
 function setR(i,v){ v=v.trim().replace('.',':'); if(!/^\d{1,2}:\d{2}$/.test(v)){ toast('Escríbelo como 6:30'); render(); return; } S.settings.ritmos=[...ritmos()]; S.settings.ritmos[i]=v; save(); toast('Ritmo guardado'); }
@@ -656,9 +654,7 @@ function openRun(id){
   openSheet(`<div class="row between"><div><div class="tiny muted bold">${s.plan?'TU PLAN · ENTRENO '+s.cod:'SESIÓN EXTRA'}</div><h3>${s.nombre}</h3><div class="small muted">${s.sub} · ${runMin(s)} min</div></div><button class="iconbtn" onclick="closeSheet()">✕</button></div>
   ${profileBar(s)}
   <div class="zones" style="margin-top:10px">${s.seg.map(([sec,zl,zh,l])=>{const r=rango(zl,zh);return `<div class="z"><div class="zb" style="background:${zc(zh)}">${ZL(zl,zh)}</div><div class="grow small">${l}<div class="tiny muted">${r.pace} min/km</div></div><div class="small muted bold" style="min-width:40px;text-align:right">${mmss(sec)}</div><div class="small bold" style="min-width:70px;text-align:right">${r.bpm}</div></div>`}).join('')}</div>
-  <div class="card small muted" style="margin-top:12px">La guía te avisa con voz y pitidos de cada cambio y te dice el rango de pulsaciones. Deja la pantalla encendida (la app intenta que no se apague sola).</div>
-  <button class="btn run block" onclick="closeSheet();startRun('${s.id}')">${icoPlay(16)} Empezar guiada</button>
-  <button class="btn block" style="margin-top:8px" onclick="closeSheet();openLog({tipo:'correr',ref:'${s.id}'})">Solo registrar</button>`);
+  <button class="btn run block" style="margin-top:14px" onclick="doneRun('${s.id}')">✓ Marcar como hecho</button>`);
 }
 
 let LOGF = {};
@@ -738,7 +734,7 @@ async function keepAwake(){ try{ if('wakeLock' in navigator){ wakeLock=await nav
 document.addEventListener('visibilitychange',()=>{ if(P&&!P.paused&&document.visibilityState==='visible') keepAwake(); });
 
 function startCasa(id){ const r=CASA.find(x=>x.id===id); startPlayer({tipo:'casa',ref:id,titulo:r.nombre,ph:buildCasa(r),color:'var(--casa)'}); }
-function startRun(id){ const s=RUN.find(x=>x.id===id); startPlayer({tipo:'correr',ref:id,titulo:s.nombre,ph:buildRun(s),color:'var(--run)'}); }
+function doneRun(id){ const s=RUN.find(x=>x.id===id); S.log.push({id:uid(),ts:Date.now(),fecha:today(),tipo:'correr',ref:id,titulo:(s.cod?s.cod+' · ':'')+s.nombre,min:runMin(s),nota:''}); save(); closeSheet(); render(); toast('Carrera hecha 🏃 · ya toca la siguiente'); }
 function startPlayer(o){
   closeSheet();
   P={...o,i:0,paused:false,endAt:0,remain:o.ph[0].sec,doneSec:0,lastBeep:null,total:totalSec(o.ph)};
