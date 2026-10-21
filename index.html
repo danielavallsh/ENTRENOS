@@ -8,8 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Entrenos">
 <meta name="theme-color" content="#111318">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Entrenos</title>
-<link rel="apple-touch-icon" id="touchIcon">
+<link rel="apple-touch-icon" id="touchIcon" href="icon-180.png">
 <link rel="icon" id="favIcon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -182,6 +183,10 @@ input[type=range]{width:100%;accent-color:var(--casa)}
 .switch input:checked + span{background:var(--run)}
 .switch input:checked + span::after{transform:translateX(20px)}
 svg.chart{width:100%;height:auto;display:block}
+.seg.sm button{padding:7px 4px;font-size:13px}
+.fbk{padding:12px 0;border-bottom:1px solid var(--line)}
+.fbk:last-of-type{border-bottom:0}
+.linkbtn{border:0;background:none;color:inherit;font-weight:800;text-decoration:underline;padding:0;cursor:pointer}
 .empty{text-align:center;color:var(--muted);padding:18px 6px;font-size:14px}
 </style>
 </head>
@@ -213,63 +218,94 @@ const EX = {
   sent_lenta:{n:'Sentadilla lenta',d:'Baja en 3 segundos hasta donde estés cómoda y sube normal. Rodillas en la dirección de la punta de los pies.'},
   balanceo:{n:'Balanceos de pierna',d:'Apoyada en la pared, balancea una pierna adelante y atrás, luego de lado a lado. 30 s por pierna.'},
   puente_act:{n:'Puente de activación',d:'Tumbada boca arriba, pies apoyados: sube la cadera apretando glúteo y aguanta 2 s arriba.'},
-  // Fuerza
-  sentadilla:{n:'Sentadilla a silla',d:'Pies a la anchura de caderas. Lleva la cadera atrás hasta rozar la silla y sube empujando el suelo con todo el pie. Pecho alto.',f:'Siéntate del todo en la silla y levántate.',h:'Sin silla, bajando en 3 s y con 1 s de pausa abajo.'},
-  flexion_incl:{n:'Flexiones inclinadas',d:'Manos en una mesa o encimera estable, cuerpo recto de cabeza a talones. Baja el pecho hasta el borde y empuja.',f:'Manos en la pared.',h:'Manos en una silla firme, o en el suelo con rodillas apoyadas.'},
-  puente_1p:{n:'Puente a una pierna',uni:1,d:'Tumbada, una pierna estirada al aire. Sube la cadera empujando con el talón de la otra y aprieta glúteo 1 s arriba.',f:'Puente con las dos piernas.',h:'Hombros apoyados en el sofá (hip thrust a una pierna).'},
-  pike:{n:'Flexión en pica',d:'Cadera alta formando una V invertida. Dobla los codos llevando la cabeza hacia el suelo entre las manos. Trabaja hombros.',f:'Manos en una silla, o solo aguantar la V empujando el suelo.',h:'Pies sobre un escalón.'},
-  zancada_inv:{n:'Zancada atrás',uni:1,d:'Paso atrás y baja la rodilla trasera hacia el suelo. El peso, en la pierna de delante. Vuelve empujando con el talón delantero.',f:'Agarrada a una silla y bajando menos.',h:'Bajada en 3 s y pausa abajo.'},
-  fondos:{n:'Fondos en silla',d:'Manos en el borde de una silla estable detrás de ti. Baja doblando los codos hacia atrás hasta unos 90° y sube.',f:'Rodillas dobladas y pies cerca de la silla.',h:'Piernas estiradas.'},
-  rdl_1p:{n:'Peso muerto a una pierna',uni:1,d:'Sobre una pierna, rodilla un poco flexionada. Inclina el tronco llevando la otra pierna atrás en línea, espalda recta. Vuelve apretando glúteo.',f:'Punta del pie de atrás apoyada en el suelo (tipo patinete).',h:'Más lento y con los brazos estirados al frente.'},
-  plancha_toques:{n:'Plancha con toques de hombro',d:'Plancha alta con pies separados. Toca el hombro contrario alternando, sin que la cadera se balancee.',f:'Con las rodillas apoyadas.',h:'Pies juntos.'},
-  step_up:{n:'Subida al escalón',uni:1,d:'Pie entero en un escalón o banco bajo y estable. Sube empujando con ESA pierna (no te impulses con la de abajo) y baja controlando.',f:'Escalón más bajo y agarrada a la barandilla.',h:'Escalón más alto y bajada en 3 s.'},
-  remo_toalla:{n:'Remo con toalla en puerta',d:'Puerta cerrada con el pestillo y que se abra hacia el otro lado. Toalla alrededor del pomo, agarra los extremos, inclínate hacia atrás con los brazos estirados y tira llevando el pecho a las manos, juntando escápulas.',f:'Más vertical: pies más lejos de la puerta.',h:'Más inclinada: pies más cerca de la puerta, o a un brazo.'},
-  buenos_dias:{n:'Buenos días',d:'Manos en la nuca, rodillas suaves. Lleva la cadera atrás inclinando el tronco con la espalda recta hasta notar los isquios. Sube apretando glúteo.',f:'Recorrido más corto.',h:'A una pierna, con la otra apoyada de puntillas atrás.'},
-  ytw:{n:'Y-T-W boca abajo',d:'Tumbada boca abajo, frente sobre una toalla. Levanta los brazos formando una Y, luego una T y luego una W, juntando escápulas. Lento.',f:'Solo la T.',h:'2 s de pausa arriba en cada letra.'},
-  sentadilla_pared:{n:'Sentadilla en pared',d:'Espalda apoyada en la pared, baja hasta una altura cómoda (sin pasar de 90°) y aguanta respirando.',f:'Menos profundidad.',h:'Más abajo, o alternando levantar un talón.'},
+
+  // Con mancuernas
+  goblet:{w:1,one:1,n:'Sentadilla goblet',d:'Una mancuerna vertical sujeta contra el pecho con las dos manos. Baja con el pecho alto y los codos entre las rodillas, y sube empujando el suelo con todo el pie.',f:'Bajando hasta rozar una silla.',h:'Bajada en 3 s y 1 s de pausa abajo.'},
+  press_suelo:{w:1,n:'Press en el suelo',d:'Tumbada boca arriba, rodillas dobladas. Empuja las mancuernas hacia el techo y baja hasta que los brazos toquen suave el suelo, codos a unos 45° del cuerpo.',f:'Palmas mirándose (agarre neutro).',h:'Bajada en 3 s, o alternando brazos.'},
+  zancada_m:{w:1,uni:1,n:'Zancada atrás con mancuernas',d:'Una mancuerna en cada mano, brazos colgando. Paso atrás bajando la rodilla trasera hacia el suelo, el peso en la pierna de delante. Vuelve empujando con el talón delantero.',f:'Con una sola mancuerna, o agarrada a una silla.',h:'Bajada en 3 s y pausa abajo.'},
+  press_hombro:{w:1,n:'Press de hombros',d:'De pie, mancuernas a la altura de los hombros. Empuja hacia arriba sin arquear la lumbar (aprieta abdomen y glúteo) y baja controlando.',f:'Sentada con la espalda apoyada.',h:'Alternando brazos, sin balancear el tronco.'},
+  rdl1_m:{w:1,uni:1,n:'Peso muerto a una pierna',d:'Una mancuerna en cada mano, de pie sobre una pierna con la rodilla un poco flexionada. Inclina el tronco llevando la otra pierna atrás en línea, espalda recta y mancuernas cerca de la pierna. Vuelve apretando glúteo.',f:'Punta del pie de atrás apoyada en el suelo (tipo patinete).',h:'Bajada en 3 s.'},
+  hip_m:{w:1,one:1,n:'Hip thrust con mancuerna',d:'Espalda alta apoyada en el sofá, pies en el suelo. Mancuerna sobre la cadera (con una toalla debajo) sujeta con las manos. Sube la cadera hasta quedar recta y aprieta glúteo 1 s arriba.',f:'Tumbada en el suelo (puente) con la mancuerna encima.',h:'Las dos mancuernas encima, o a una pierna.'},
+  rdl_m:{w:1,n:'Peso muerto rumano',d:'Mancuernas delante de los muslos, rodillas un poco flexionadas. Lleva la cadera atrás deslizando las mancuernas pegadas a las piernas hasta media tibia, espalda recta. Sube apretando glúteo.',f:'Recorrido corto, solo hasta las rodillas.',h:'Bajada en 3 s y pausa abajo.'},
+  remo_m:{w:1,n:'Remo inclinado',d:'Tronco inclinado unos 45°, como en el peso muerto, brazos colgando. Tira de las mancuernas hacia la cadera llevando los codos atrás y juntando escápulas. Baja controlando.',f:'Con el pecho apoyado en el respaldo de una silla al revés.',h:'Pausa de 1 s arriba.'},
+  step_m:{w:1,uni:1,n:'Subida al escalón con mancuernas',d:'Una mancuerna en cada mano. Pie entero en un escalón o banco bajo y estable. Sube empujando con ESA pierna (sin impulsarte con la de abajo) y baja controlando.',f:'Sin mancuernas y agarrada a la barandilla.',h:'Escalón más alto y bajada en 3 s.'},
+  remo1_m:{w:1,one:1,uni:1,n:'Remo a un brazo',d:'Mano y rodilla del mismo lado apoyadas en el sofá o una silla, espalda plana. Con la otra mano tira de una mancuerna hacia la cadera, codo pegado, y baja estirando del todo.',f:'Menos recorrido.',h:'Las dos mancuernas en una mano, o pausa de 2 s arriba.'},
+  sumo_m:{w:1,one:1,n:'Sentadilla sumo',d:'Pies bastante separados y puntas hacia fuera. Una mancuerna colgando entre las piernas sujeta con las dos manos. Baja recta, rodillas hacia fuera, y sube apretando glúteo.',f:'Menos profundidad.',h:'Las dos mancuernas a la vez, o pausa de 2 s abajo.'},
+  pullover_m:{w:1,one:1,n:'Pullover en el suelo',d:'Tumbada boca arriba, rodillas dobladas, una mancuerna sujeta con las dos manos encima del pecho. Llévala hacia atrás por encima de la cabeza con los codos casi estirados, sin despegar las costillas, y vuelve.',f:'Recorrido corto.',h:'Bajada en 3 s.'},
+  curl_m:{w:1,n:'Curl de bíceps',d:'De pie, codos pegados al cuerpo. Sube las mancuernas girando las palmas hacia ti sin balancear el tronco, y baja despacio.',f:'Alternando brazos.',h:'Bajada en 3 s.'},
+  laterales:{w:1,n:'Elevaciones laterales',d:'Brazos a los lados, codos un poco doblados. Sube las mancuernas hasta la altura de los hombros, sin encogerlos, y baja lento.',f:'Hasta media altura.',h:'Pausa de 1 s arriba y bajada en 3 s.'},
+  thruster_m:{w:1,n:'Sentadilla con press',d:'Mancuernas en los hombros. Haz una sentadilla y, al subir, aprovecha el impulso para empujar las mancuernas por encima de la cabeza. Bájalas a los hombros y repite.',f:'Sentadilla y press por separado, sin impulso.',h:'Más rápido, sin parar arriba.'},
+  swing_m:{w:1,one:1,n:'Swing con mancuerna',d:'Una mancuerna sujeta con las dos manos por un extremo. Lleva la cadera atrás pasándola entre las piernas y lánzala hasta la altura del pecho con un golpe de cadera, no con los brazos. Espalda recta siempre.',f:'Peso muerto rumano con una mancuerna, sin impulso.',h:'Más peso o más rápido.'},
+  renegade_m:{w:1,n:'Remo en plancha',d:'Plancha alta con las manos en las mancuernas y los pies separados. Rema con un brazo llevando la mancuerna a la cadera sin girar la cadera, y alterna.',f:'Rodillas apoyadas.',h:'Pies juntos, o flexión entre cada par de remos.'},
+  curl_press:{w:1,n:'Curl + press',d:'Curl de bíceps sin balancear y, desde arriba, empuja las mancuernas por encima de la cabeza girando las palmas. Deshaz el movimiento al bajar.',f:'Solo el curl.',h:'Bajada en 3 s.'},
+
+  // Con barra larga
+  sent_b:{w:1,n:'Sentadilla con barra',d:'Barra apoyada en la parte alta de la espalda (no en el cuello), manos más abiertas que los hombros. Baja con el pecho alto y sube empujando el suelo. Para colocarla, súbela por encima de la cabeza y bájala a la espalda.',f:'Barra delante, apoyada en los hombros con los brazos cruzados (sentadilla frontal).',h:'Bajada en 3 s y pausa abajo.'},
+  hip_b:{w:1,n:'Hip thrust con barra',d:'Sentada en el suelo con la espalda alta contra el sofá, rueda la barra hasta la cadera y pon una toalla doblada debajo. Sube la cadera hasta quedar recta, aprieta glúteo 1 s y baja.',f:'Puente en el suelo con la barra encima.',h:'Pausa de 3 s arriba.'},
+  pm_b:{w:1,n:'Peso muerto rumano con barra',d:'De pie con la barra en las manos, a la anchura de los hombros. Lleva la cadera atrás bajando la barra pegada a las piernas hasta media tibia, espalda recta. Sube apretando glúteo. Para cogerla del suelo, flexiona las rodillas sin redondear.',f:'Recorrido corto, hasta las rodillas.',h:'Bajada en 3 s.'},
+  remo_b:{w:1,n:'Remo con barra',d:'Tronco inclinado unos 45°, barra colgando con agarre algo más ancho que los hombros. Tira de ella hacia el ombligo juntando escápulas y baja controlando.',f:'Tronco más vertical.',h:'Pausa de 1 s con la barra tocando el cuerpo.'},
+  zancada_b:{uni:1,w:1,n:'Zancada atrás con barra',d:'Barra en la parte alta de la espalda. Paso atrás bajando la rodilla trasera hacia el suelo, tronco recto, y vuelve empujando con el talón delantero.',f:'Barra delante en los hombros, o sin barra agarrada a una silla.',h:'Bajada en 3 s y pausa abajo.'},
+  press_suelo_b:{w:1,n:'Press en el suelo con barra',d:'Tumbada boca arriba, rodillas dobladas, manos algo más abiertas que los hombros. Baja la barra hacia la parte baja del pecho hasta que los brazos toquen el suelo y empuja.',f:'Agarre más cerrado y recorrido corto.',h:'Bajada en 3 s y pausa con los brazos en el suelo.'},
+  press_b:{w:1,n:'Press militar con barra',d:'De pie, barra delante de los hombros, manos algo más abiertas que ellos. Empújala por encima de la cabeza apartando la cara y sin arquear la lumbar. Baja a los hombros.',f:'Sentada en una silla.',h:'Bajada en 3 s.'},
+  curl_b:{w:1,n:'Curl con barra',d:'De pie, barra con las palmas hacia delante y codos pegados. Súbela sin balancear el tronco y bájala despacio.',f:'Recorrido de la mitad hacia arriba.',h:'Bajada en 3 s.'},
+
+  // Peso corporal
   flexion:{n:'Flexiones',d:'Manos bajo los hombros, cuerpo en línea. Baja el pecho con control y empuja. Codos a unos 45°, no abiertos en cruz.',f:'Rodillas apoyadas, o inclinadas en una mesa.',h:'Bajada en 3 s.'},
-  puente_marcha:{n:'Puente con marcha',d:'En el puente arriba, levanta un pie y luego el otro sin que la cadera caiga ni gire.',f:'Puente normal con pausa arriba.',h:'Puente a una pierna.'},
-  superman:{n:'Nadador',d:'Boca abajo, brazos al frente. Despega un poco pecho y piernas y mueve los brazos como en braza, de delante hacia la cintura.',f:'Levanta brazo y pierna contrarios, alternando.',h:'2 s de pausa en cada repetición.'},
-  sent_talones:{n:'Sentadilla + puntillas',d:'Sentadilla y, al subir, ponte de puntillas. Ritmo fluido y controlado.',f:'Sentadilla a silla + puntillas.',h:'Pausa de 2 s abajo.'},
-  flexion_plancha:{n:'Flexión + plancha',d:'Una flexión y 3 segundos aguantando la plancha alta. Repite.',f:'Inclinada en mesa.',h:'Flexión con bajada en 3 s.'},
-  zancada_lat:{n:'Zancada lateral',uni:1,d:'Paso amplio hacia el lado, cadera atrás, rodilla de esa pierna sobre el pie y la otra estirada. Vuelve empujando.',f:'Paso más corto y bajando poco.',h:'Más profunda y con pausa.'},
-  escalador:{n:'Escaladores lentos',d:'Plancha alta. Lleva una rodilla hacia el pecho y luego la otra, con control y sin saltar. Sube el ritmo si te ves bien.',f:'Manos en la mesa o en el sofá.',h:'Más rápido, manteniendo la cadera baja.'},
-  puente:{n:'Puente de glúteo',d:'Tumbada, pies a la anchura de caderas. Sube la cadera apretando glúteo y baja despacio.',f:'Recorrido corto.',h:'3 s de pausa arriba.'},
-  split_iso:{n:'Zancada estática',uni:1,d:'Un pie delante y otro detrás, fijos. Baja y sube en vertical sin mover los pies, el tronco recto.',f:'Agarrada a una silla y bajando poco.',h:'2 s de pausa abajo.'},
-  oso:{n:'Posición de oso',d:'A cuatro patas, despega las rodillas 2-3 cm del suelo y aguanta con la espalda plana. Si puedes, da pasitos adelante y atrás.',f:'Despegar en tandas de 10 s.',h:'Desplazándote (paso de oso).'},
+  fondos:{n:'Fondos en silla',d:'Manos en el borde de una silla estable detrás de ti. Baja doblando los codos hacia atrás hasta unos 90° y sube.',f:'Rodillas dobladas y pies cerca de la silla.',h:'Piernas estiradas.'},
+  ytw:{n:'Y-T-W boca abajo',d:'Tumbada boca abajo, frente sobre una toalla. Levanta los brazos formando una Y, luego una T y luego una W, juntando escápulas. Lento.',f:'Solo la T.',h:'Con un disco de 1,25 kg en cada mano.'},
   sent_salto:{n:'Sentadilla con salto',d:'Sentadilla normal y sube explotando en un salto. Aterriza suave, con las rodillas flexionadas, y encadena la siguiente.',f:'Sentadilla rápida subiendo de puntillas, sin salto.',h:'Pausa de 1 s abajo antes de saltar.'},
   zancada_salto:{n:'Zancadas alternas con salto',d:'Desde posición de zancada, salta y cambia de pierna en el aire. Aterriza suave y controla la bajada.',f:'Zancada atrás alterna, sin salto.',h:'Baja más y salta más alto.'},
   burpee:{n:'Burpee',d:'Agáchate, manos al suelo, pies atrás a plancha, recoge y sube con un pequeño salto.',f:'Sin salto y llevando los pies atrás de uno en uno.',h:'Con flexión abajo.'},
   patinador:{n:'Saltos de patinador',d:'Salta de lado de un pie al otro, como un patinador, cruzando la pierna libre por detrás. Aterriza estable.',f:'Paso lateral sin salto.',h:'Salto más largo y 1 s quieta en cada aterrizaje.'},
   jacks:{n:'Jumping jacks',d:'Saltos abriendo piernas y brazos a la vez y cerrando. Ritmo constante.',f:'Abre una pierna cada vez, sin salto.',h:'Con sentadilla al abrir.'},
   escalador_rap:{n:'Escaladores',d:'Plancha alta y lleva las rodillas al pecho alternando, rápido y con la cadera baja.',f:'Más lento.',h:'Cruzando la rodilla hacia el codo contrario.'},
-  // Core y acabado
-  deadbug:{n:'Bicho muerto',d:'Boca arriba, brazos al techo y rodillas a 90°. Estira brazo y pierna contrarios sin que la lumbar se despegue del suelo.',f:'Solo piernas.',h:'Más lento, soltando todo el aire.'},
+
+  // Core
+  deadbug:{n:'Bicho muerto',d:'Boca arriba, brazos al techo y rodillas a 90°. Estira brazo y pierna contrarios sin que la lumbar se despegue del suelo.',f:'Solo piernas.',h:'Con un disco de 1,25 kg en cada mano.'},
   lateral:{n:'Plancha lateral',d:'Codo bajo el hombro, cuerpo en línea y cadera alta.',f:'Con las rodillas apoyadas.',h:'Pierna de arriba elevada.'},
   birddog:{n:'Bird dog',d:'A cuatro patas, estira brazo y pierna contrarios y vuelve tocando codo con rodilla. Sin que la cadera gire.',f:'Solo piernas.',h:'2 s de pausa estirada.'},
   crunch_inv:{n:'Crunch inverso',d:'Boca arriba, rodillas a 90°. Despega la cadera llevando las rodillas al pecho, sin impulso.',f:'Recorrido corto.',h:'Piernas más estiradas.'},
   plancha:{n:'Plancha',d:'Antebrazos en el suelo, cuerpo en línea. Aprieta glúteo y abdomen y respira.',f:'Rodillas apoyadas.',h:'Alterna levantar un pie.'},
-  talones:{n:'Elevación de gemelos',d:'Puntas de los pies en un escalón, sube y baja lento hasta notar estirar el gemelo. Clave para correr.',f:'En el suelo.',h:'A una pierna (cambia a mitad).'},
-  almeja:{n:'Almeja',d:'De lado, rodillas dobladas y pies juntos. Abre la rodilla de arriba sin que la cadera ruede hacia atrás. Trabaja el glúteo medio, clave al correr.',f:'Recorrido corto.',h:'Pausa de 2 s arriba.'},
-  hollow:{n:'Barca',d:'Boca arriba, lumbar pegada al suelo, despega hombros y piernas y aguanta.',f:'Rodillas dobladas.',h:'Piernas estiradas y bajas.'}
+  talones:{n:'Elevación de gemelos',d:'Puntas de los pies en un escalón, sube y baja lento hasta notar estirar el gemelo. Clave para correr.',f:'En el suelo.',h:'Con una mancuerna en la mano, o a una pierna.'},
+  almeja:{n:'Almeja',d:'De lado, rodillas dobladas y pies juntos. Abre la rodilla de arriba sin que la cadera ruede hacia atrás. Trabaja el glúteo medio, clave al correr.',f:'Recorrido corto.',h:'Con un disco de 2 kg sobre la rodilla.'},
+  hollow:{n:'Barca',d:'Boca arriba, lumbar pegada al suelo, despega hombros y piernas y aguanta.',f:'Rodillas dobladas.',h:'Piernas estiradas y bajas.'},
+  rusa:{n:'Giro ruso con disco',d:'Sentada, rodillas dobladas y talones en el suelo. Inclina el tronco atrás con la espalda recta y gira llevando un disco de 2 kg de una cadera a la otra.',f:'Sin disco.',h:'Con los pies en el aire.'}
 };
 
 const WARM = ['marcha','cadera','gatocamello','rot_tor','sent_lenta','balanceo','puente_act'];
 
+/* eq: 'm' = mancuernas, 'b' = barra larga. pesos: kg de discos por defecto de cada bloque
+   (en mancuernas, por mancuerna; en barra, total). Cada bloque usa un mismo peso. */
 const CASA = [
-  {id:'A',nombre:'Fuerza A',sub:'Pierna y empuje',
-    bloques:[['sentadilla','flexion_incl'],['puente_1p','pike'],['zancada_inv','fondos'],['rdl_1p','plancha_toques']],
-    core:[['deadbug'],['lateral','Izquierda'],['lateral','Derecha'],['birddog'],['crunch_inv'],['plancha'],['talones']]},
-  {id:'B',nombre:'Fuerza B',sub:'Espalda, glúteo y tirón',
-    bloques:[['step_up','remo_toalla'],['buenos_dias','ytw'],['sentadilla_pared','flexion'],['puente_marcha','superman']],
-    core:[['plancha'],['deadbug'],['almeja','Izquierda'],['almeja','Derecha'],['hollow'],['birddog'],['talones']]},
-  {id:'C',nombre:'Fuerza C',sub:'Cuerpo entero con ritmo',
-    bloques:[['sent_talones','flexion_plancha'],['zancada_lat','remo_toalla'],['escalador','puente'],['split_iso','oso']],
-    core:[['birddog'],['lateral','Izquierda'],['lateral','Derecha'],['deadbug'],['hollow'],['almeja','Izquierda'],['almeja','Derecha']]},
-  {id:'D',nombre:'Fuerza D',sub:'Potencia y cardio, con saltos',
-    bloques:[['sent_salto','flexion'],['zancada_salto','remo_toalla'],['burpee','puente_1p'],['patinador','plancha_toques']],
-    core:[['escalador_rap'],['deadbug'],['lateral','Izquierda'],['lateral','Derecha'],['hollow'],['jacks'],['plancha']]}
+  {id:'A',nombre:'Fuerza A',sub:'Pierna y empuje',eq:'m',pesos:[5.5,4,5.5,13],
+    bloques:[['goblet','press_suelo'],['zancada_m','press_hombro'],['rdl1_m','flexion'],['hip_m','fondos']],
+    core:[['deadbug'],['lateral','Izquierda'],['lateral','Derecha'],['birddog'],['rusa'],['plancha'],['talones']]},
+  {id:'B',nombre:'Fuerza B',sub:'Espalda y glúteo',eq:'m',pesos:[7,5.5,[9.5,4],3],
+    bloques:[['rdl_m','remo_m'],['step_m','remo1_m'],['sumo_m','pullover_m'],['curl_m','ytw']],
+    core:[['plancha'],['deadbug'],['almeja','Izquierda'],['almeja','Derecha'],['hollow'],['rusa'],['talones']]},
+  {id:'C',nombre:'Fuerza C',sub:'Con barra, cuerpo entero',eq:'b',pesos:[15,15,9,5],
+    bloques:[['sent_b','hip_b'],['pm_b','remo_b'],['zancada_b','press_suelo_b'],['press_b','curl_b']],
+    core:[['birddog'],['lateral','Izquierda'],['lateral','Derecha'],['deadbug'],['hollow'],['crunch_inv'],['plancha']]},
+  {id:'D',nombre:'Fuerza D',sub:'Potencia y cardio, con saltos',eq:'m',saltos:1,pesos:[3,8,4,2.5],
+    bloques:[['thruster_m','sent_salto'],['swing_m','burpee'],['renegade_m','zancada_salto'],['curl_press','patinador']],
+    core:[['escalador_rap'],['deadbug'],['lateral','Izquierda'],['lateral','Derecha'],['rusa'],['jacks'],['plancha']]}
 ];
+
+/* Material: 4 discos de 2 kg, 4 de 1,5 kg y 4 de 1,25 kg.
+   Mancuernas: como máximo 1 disco de cada tamaño por lado. Barra larga: hasta 2 de cada por lado. */
+const kgTxt = k=>String(Math.round(k*100)/100).replace('.',',');
+function opciones(eq){
+  const max = eq==='b'?2:1, m={};
+  for(let a=0;a<=max;a++)for(let b=0;b<=max;b++)for(let c=0;c<=max;c++){
+    const lado=2*a+1.5*b+1.25*c; if(!lado) continue;
+    const kg=Math.round(lado*2*100)/100, n=a+b+c;
+    if(!m[kg]||m[kg].n>n) m[kg]={kg,n,lado:[...Array(a).fill(2),...Array(b).fill(1.5),...Array(c).fill(1.25)].map(kgTxt).join(' + ')};
+  }
+  return Object.values(m).sort((x,y)=>x.kg-y.kg);
+}
+const OPC = {m:opciones('m'),b:opciones('b')};
+const optOf = (eq,kg)=>OPC[eq].find(o=>o.kg===kg);
+const EQ_TXT = {m:'Mancuernas',b:'Barra larga'};
 const LV = {1:{w:40,r:20,t:'Base',d:'40 s trabajo / 20 s pausa'},2:{w:45,r:15,t:'Media',d:'45 s trabajo / 15 s pausa'},3:{w:50,r:10,t:'Alta',d:'50 s trabajo / 10 s pausa'}};
 
 /* =========================================================
@@ -307,11 +343,95 @@ const RUN = [...PLAN.map(p=>({...p,plan:1})),...OTRAS];
    ESTADO
    ========================================================= */
 const KEY = 'entrenos.v2';
-const DEF = {settings:{nombre:'Daniela',edad:'',fcmax:186,fcrep:'',custom:true,zonas:[[134,143],[144,157],[158,163],[164,174],[175,186]],ritmos:['7:48','7:09','6:31','6:00','5:21'],nivel:2,objCorrer:3,objCasa:4,voz:true,sonido:true},log:[],body:[],nextCasa:0};
+const DEF = {settings:{nombre:'Daniela',edad:'',fcmax:186,fcrep:'',custom:true,zonas:[[134,143],[144,157],[158,163],[164,174],[175,186]],ritmos:['7:48','7:09','6:31','6:00','5:21'],nivel:2,objCorrer:3,objCasa:4,voz:true,sonido:true,barraM:0,barraL:0},log:[],body:[],nextCasa:0,pesos:{},var:{},lastBackup:0,backupSnooze:0};
 let S = load();
 function load(){
   try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d) return {...structuredClone(DEF),...d,settings:{...DEF.settings,...(d.settings||{})}}; }catch(e){}
   return structuredClone(DEF);
+}
+const arr = v=>Array.isArray(v)?v:[v];
+const getR = r=>typeof r==='string'?CASA.find(x=>x.id===r):r;
+function snapKg(opts,v){ return opts.reduce((a,b)=>Math.abs(b.kg-v)<Math.abs(a.kg-v)?b:a).kg; }
+/* Cómo se carga cada bloque:
+   barra = barra larga · par = las dos mancuernas igual · solo = una mancuerna (puede llevar todos los discos)
+   dos = cada ejercicio usa una mancuerna, así que pueden pesar distinto */
+function modo(r,bi){
+  r=getR(r); if(!r||!r.eq) return null; if(r.eq==='b') return 'barra';
+  const w=r.bloques[bi].filter(k=>EX[k].w);
+  if(w.length&&w.every(k=>EX[k].one)) return w.length===1?'solo':'dos';
+  return 'par';
+}
+function opcBlk(r,bi){ const m=modo(r,bi); return (m==='barra'||m==='solo')?OPC.b:OPC.m; }
+function pesoBlk(r,bi){
+  r=getR(r); if(!r||!r.eq) return [];
+  const n=modo(r,bi)==='dos'?2:1, d=arr(r.pesos[bi]);
+  const st=S.pesos&&S.pesos[r.id]&&S.pesos[r.id][bi], src=st!=null?arr(st):d;
+  return Array.from({length:n},(_,j)=>snapKg(opcBlk(r,bi), +(src[j]??src[0]??d[j]??d[0])));
+}
+const pesosRut = r=>getR(r).bloques.map((_,i)=>pesoBlk(r,i));
+const blkTxt = a=>arr(a).map(kgTxt).join(' y ');
+const rutTxt = p=>p.map(blkTxt).join(' / ');
+function setPeso(id,bi,j,v){ S.pesos=S.pesos||{}; S.pesos[id]=pesosRut(id); S.pesos[id][bi][j]=+v; save(); toast(`Bloque ${bi+1}: ${blkTxt(S.pesos[id][bi])} kg`); }
+function pesoEx(r,bi,ex){ const a=pesoBlk(r,bi); if(a.length>1){ const w=r.bloques[bi].filter(k=>EX[k].w); return a[Math.max(0,w.indexOf(ex))]; } return a[0]; }
+function conBarra(eq,kg){ const bar=eq==='b'?+S.settings.barraL:+S.settings.barraM; return bar>0?` · ${kgTxt(kg+bar)} kg con barra`:''; }
+function cargaTxt(r,bi,ex){
+  const kg=pesoEx(r,bi,ex), m=modo(r,bi);
+  if(m==='barra') return `Barra + ${kgTxt(kg)} kg`;
+  return (m==='par'&&!EX[ex].one)?`2 × ${kgTxt(kg)} kg`:`1 mancuerna de ${kgTxt(kg)} kg`;
+}
+const MODO_TXT = {barra:'Discos en la barra',par:'Cada mancuerna',solo:'Una sola mancuerna',dos:'Una mancuerna por ejercicio'};
+function montaje(r,bi){
+  const m=modo(r,bi), a=pesoBlk(r,bi), opts=opcBlk(r,bi), L=k=>(opts.find(o=>o.kg===k)||{}).lado||'—';
+  if(m==='barra') return {name:`${kgTxt(a[0])} kg en la barra`,sub:`En cada lado: ${L(a[0])}${conBarra('b',a[0])}`,voz:`${kgTxt(a[0])} kilos de discos en la barra. En cada lado, ${L(a[0])}`};
+  if(m==='par') return {name:`2 × ${kgTxt(a[0])} kg`,sub:`En cada lado: ${L(a[0])}${conBarra('m',a[0])}`,voz:`${kgTxt(a[0])} kilos en cada mancuerna. En cada lado, ${L(a[0])}`};
+  if(m==='solo') return {name:`1 mancuerna de ${kgTxt(a[0])} kg`,sub:`En cada lado: ${L(a[0])}${conBarra('m',a[0])}`,voz:`Una sola mancuerna de ${kgTxt(a[0])} kilos. En cada lado, ${L(a[0])}`};
+  const w=r.bloques[bi].filter(k=>EX[k].w);
+  return {name:`Mancuernas de ${kgTxt(a[0])} y ${kgTxt(a[1])} kg`,sub:w.map((k,j)=>`${EX[k].n}: ${L(a[j])} por lado`).join(' · '),
+    voz:`Una mancuerna de ${kgTxt(a[0])} kilos para ${EX[w[0]].n}, y otra de ${kgTxt(a[1])} para ${EX[w[1]].n}`};
+}
+function pesoSelect(r,i,lado,vals,onch){
+  vals=vals||pesoBlk(r,i); const opts=opcBlk(r,i), m=modo(r,i), w=r.bloques[i].filter(k=>EX[k].w);
+  return vals.map((v,j)=>`<div class="row" style="gap:8px;justify-content:flex-end;margin:2px 0">${m==='dos'?`<span class="tiny muted">${EX[w[j]].n}</span>`:''}<select class="in" style="width:auto;max-width:230px;padding:8px 10px" onchange="${onch?onch(j):`setPeso('${r.id}',${i},${j},this.value)`}">${opts.map(o=>`<option value="${o.kg}" ${v===o.kg?'selected':''}>${kgTxt(o.kg)} kg${lado?' · lado '+o.lado:''}</option>`).join('')}</select></div>`).join('');
+}
+
+/* Variantes: -1 fácil, 0 normal, 1 difícil (por ejercicio) */
+const varOf = k=>+((S.var||{})[k])||0;
+function setVar(k,v,el){ S.var=S.var||{}; S.var[k]=v; save(); if(el) el.parentNode.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===v+1)); }
+function varSeg(k){ const v=varOf(k); return `<div class="seg sm" style="margin-top:8px">${['Fácil','Normal','Difícil'].map((t,i)=>`<button class="${v===i-1?'on':''}" onclick="setVar('${k}',${i-1},this)">${t}</button>`).join('')}</div>`; }
+const VAR_TXT = {'-1':'Versión fácil','1':'Versión difícil'};
+
+/* Progresión por bloque: dos veces seguidas igual con el mismo peso → se ajusta */
+const sameArr=(a,b)=>arr(a).length===arr(b).length&&arr(a).every((x,i)=>+x===+arr(b)[i]);
+function stepArr(opts,a,d){ const ks=opts.map(o=>o.kg); return a.map(v=>{const i=ks.indexOf(v); return ks[Math.min(ks.length-1,Math.max(0,i+d))];}); }
+function prevBlk(ref,bi){ return [...S.log].filter(l=>l.tipo==='casa'&&l.ref===ref&&Array.isArray(l.bloques)&&l.bloques[bi]!=null).sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.ts||0)-(a.ts||0))[0]; }
+function decide(r,bi,v,used){
+  const res={next:[...used],vars:{},hint:''};
+  if(!v) return res;
+  const p=prevBlk(r.id,bi), same=p&&p.bloques[bi]===v&&p.pesos&&sameArr(p.pesos[bi],used);
+  if(!same){ res.hint=v>0?'Apuntado. Si te vuelve a sobrar con este peso, la próxima subimos.':'Apuntado. Si vuelve a costarte tanto con este peso, bajamos.'; return res; }
+  const w=r.bloques[bi].filter(k=>EX[k].w&&EX[k].f), st=stepArr(opcBlk(r,bi),used,v);
+  if(v>0){
+    const easy=w.filter(k=>varOf(k)<0);
+    if(easy.length){ easy.forEach(k=>res.vars[k]=0); res.hint='Dos veces seguidas te ha sobrado: vuelves a la versión normal.'; }
+    else if(!sameArr(st,used)){ res.next=st; res.hint=`Dos veces seguidas te ha sobrado: la próxima, ${blkTxt(st)} kg.`; }
+    else { const nor=w.filter(k=>varOf(k)<1);
+      if(nor.length){ nor.forEach(k=>res.vars[k]=1); res.hint='Ya llevas todos los discos posibles: la próxima vez, versión difícil.'; }
+      else res.hint='Máximo peso y versión difícil: piensa en subir de nivel.'; }
+  } else {
+    const hard=w.filter(k=>varOf(k)>0);
+    if(hard.length){ hard.forEach(k=>res.vars[k]=0); res.hint='Dos veces seguidas te ha costado mucho: vuelves a la versión normal.'; }
+    else if(!sameArr(st,used)){ res.next=st; res.hint=`Dos veces seguidas te ha costado mucho: la próxima, ${blkTxt(st)} kg.`; }
+    else { w.filter(k=>varOf(k)>-1).forEach(k=>res.vars[k]=-1); res.hint='Ya estás en el peso mínimo: la próxima vez, versión fácil.'; }
+  }
+  return res;
+}
+
+/* Copias de seguridad */
+function backupDue(){
+  if(S.log.length<5) return 0; const now=Date.now();
+  if(S.backupSnooze&&now<S.backupSnooze) return 0;
+  if(!S.lastBackup) return -1;
+  const d=Math.floor((now-S.lastBackup)/864e5); return d>=30?d:0;
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('No se ha podido guardar'); } }
 
@@ -358,13 +478,18 @@ function rango(zl,zh){
 function buildCasa(r){
   const lv = LV[S.settings.nivel]||LV[2], ph=[];
   WARM.forEach((k,i)=>ph.push({k:'warm',ex:k,sec:60,tag:'Calentamiento',info:`${i+1}/${WARM.length}`}));
+  if(r.eq){
+    ph.push({k:'rest',sec:r.eq==='b'?120:60,long:true,setup:0});
+    r.bloques[0].filter(k=>EX[k].w).forEach(k=>ph.push({k:'warm',ex:k,sec:30,approx:1,blk:0}));
+  }
   r.bloques.forEach((b,bi)=>{
     for(let ro=1;ro<=4;ro++){
       b.forEach((ex,ei)=>{
         const side = EX[ex].uni ? (ro%2?'Derecha':'Izquierda') : '';
-        ph.push({k:'work',ex,sec:lv.w,side,tag:`Bloque ${bi+1} · Ronda ${ro}/4`});
+        ph.push({k:'work',ex,sec:lv.w,side,tag:`Bloque ${bi+1} · Ronda ${ro}/4`,blk:r.eq?bi:undefined});
         const lastOfBlock = ro===4 && ei===b.length-1;
-        ph.push({k:'rest',sec:lastOfBlock?60:lv.r,long:lastOfBlock});
+        const setup = r.eq && lastOfBlock && bi<r.bloques.length-1 ? bi+1 : undefined;
+        ph.push({k:'rest',sec:lastOfBlock?60:lv.r,long:lastOfBlock,setup});
       });
     }
   });
@@ -387,6 +512,20 @@ function suggestRun(){
   const last=[...S.log].filter(l=>l.tipo==='correr'&&PLAN.some(p=>p.id===l.ref)).sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.ts||0)-(a.ts||0))[0];
   const i= last ? (PLAN.findIndex(p=>p.id===last.ref)+1)%PLAN.length : 0;
   return RUN.find(r=>r.id===PLAN[i].id);
+}
+const intensa = s=>!!s&&s.seg.some(x=>x[2]>=4);
+function casaHoy(){
+  const nx=nextCasa(), run=suggestRun();
+  if(vHoy.forzar||!(nx.eq==='b'||nx.saltos)) return {r:nx};
+  const ayer=new Date(); ayer.setDate(ayer.getDate()-1);
+  const reciente=S.log.find(l=>l.tipo==='correr'&&(l.fecha===today()||l.fecha===ymd(ayer))&&intensa(RUN.find(x=>x.id===l.ref)));
+  const prox=intensa(run);
+  if(!reciente&&!prox) return {r:nx};
+  const i0=CASA.indexOf(nx); let alt=null;
+  for(let k=1;k<CASA.length;k++){ const c=CASA[(i0+k)%CASA.length]; if(c.eq!=='b'&&!c.saltos){alt=c;break;} }
+  if(!alt) return {r:nx};
+  const motivo = reciente ? `Has hecho una carrera intensa ${reciente.fecha===today()?'hoy':'ayer'}` : `Tu próxima carrera (${run.cod} · ${run.nombre}) es intensa`;
+  return {r:alt,swap:nx,motivo:`${motivo}: hoy mejor la ${alt.id}, que carga menos las piernas${nx.saltos?' y no tiene saltos':''}. La ${nx.id} sigue siendo la siguiente.`};
 }
 function levelAdvice(){
   const lv=+S.settings.nivel;
@@ -416,7 +555,7 @@ function vHoy(){
   const ws=weekStart(), wl=weekLogs(), tdy=today();
   const nC=wl.filter(l=>l.tipo==='casa').length, nR=wl.filter(l=>l.tipo==='correr').length;
   const mins=wl.reduce((a,l)=>a+(+l.min||0),0);
-  const r=nextCasa(), run=suggestRun(), adv=levelAdvice();
+  const plan=casaHoy(), r=plan.r, run=suggestRun(), adv=levelAdvice(), bk=backupDue();
   const hora=new Date().getHours();
   const saludo = hora<14?'Buenos días':hora<21?'Buenas tardes':'Buenas noches';
   const doneToday = S.log.filter(l=>l.fecha===tdy);
@@ -426,6 +565,7 @@ function vHoy(){
   return `
   <div class="top"><div class="date">${fmtLong(new Date())}</div><h1>${saludo}${S.settings.nombre?', '+esc(S.settings.nombre):''}</h1></div>
   ${adv?`<div class="banner"><div>${adv.txt}</div><div class="row" style="margin-top:10px"><button class="btn sm" onclick="setLevel(${+S.settings.nivel+adv.dir})">${adv.dir>0?'Subir':'Bajar'} nivel</button></div></div>`:''}
+  ${bk?`<div class="banner"><div>💾 ${bk<0?'Aún no has hecho ninguna copia de tus datos':'Hace '+bk+' días de tu última copia'}, y solo están guardados en este móvil.</div><div class="row" style="margin-top:10px"><button class="btn sm" onclick="exportData()">Hacer copia</button><button class="btn sm" style="background:transparent" onclick="S.backupSnooze=Date.now()+7*864e5;save();render()">Más tarde</button></div></div>`:''}
   <div class="card">
     <div class="row between"><span class="bold">Esta semana</span><span class="muted small bold">${mins} min</span></div>
     <div class="week" style="margin-top:12px">${days}</div>
@@ -435,9 +575,10 @@ function vHoy(){
   ${doneToday.length?`<div class="card"><div class="small muted bold" style="margin-bottom:4px">HOY YA HAS HECHO</div>${doneToday.map(itemHTML).join('')}</div>`:''}
   <h2>Toca en casa</h2>
   <div class="hero casa"><div class="deco"></div><div class="deco2"></div>
-    <div class="kicker">Rutina ${r.id} · Nivel ${S.settings.nivel}</div>
+    <div class="kicker">Rutina ${r.id} · Nivel ${S.settings.nivel}${plan.swap?' · en vez de la '+plan.swap.id:''}</div>
     <h3>${r.nombre}</h3><p>${r.sub}</p>
-    <div class="meta"><span class="pill">⏱ ${Math.round(totalSec(buildCasa(r))/60)} min</span><span class="pill">Sin material</span>${r.id==='D'?'<span class="pill">Con saltos</span>':''}</div>
+    <div class="meta"><span class="pill">⏱ ${Math.round(totalSec(buildCasa(r))/60)} min</span><span class="pill">${EQ_TXT[r.eq]||'Sin material'}</span>${r.saltos?'<span class="pill">Con saltos</span>':''}</div>
+    ${plan.swap?`<p style="font-size:13px;margin:-4px 0 14px">${plan.motivo} <button class="linkbtn" onclick="vHoy.forzar=1;render()">Hacer la ${plan.swap.id} igualmente</button></p>`:''}
     <div class="row"><button class="btn white" onclick="startCasa('${r.id}')">${icoPlay(16)} Empezar</button><button class="btn ghostw" onclick="openCasa('${r.id}')">Ver ejercicios</button></div>
   </div>
   <h2>Si sales a correr</h2>
@@ -455,8 +596,9 @@ function tipDelDia(){
     'Si un día corres y haces la rutina, sepáralas unas horas si puedes. Si no, da igual el orden: empieza por la que más te apetezca ese día.',
     'La recomposición se ve mejor en la cinta métrica que en la báscula: apunta la cintura cada 2 semanas en Progreso.',
     'Proteína en cada comida y dormir bien hacen tanto por la recomposición como la propia rutina.',
-    'Si un ejercicio te sobra, pasa a su variante difícil antes de subir de nivel: así la rutina sigue costando.',
-    'Zona 2 bien hecha (144–157): deberías poder hablar en frases. Si no puedes, frena aunque te parezca lento.',
+    'Si acabas un bloque con 2-3 repeticiones de sobra bien hechas, sube al siguiente peso. Cuando no puedas subir más, pasa a la variante difícil.',
+    'Antes de empezar, aprieta bien las roscas de las mancuernas y los cierres de la barra. Y comprueba que hay el mismo peso en cada lado.',
+    `Zona 2 bien hecha (${zonas()[1][0]}–${zonas()[1][1]}): deberías poder hablar en frases. Si no puedes, frena aunque te parezca lento.`,
     'Calidad antes que cantidad: en los 45 segundos no cuentes repeticiones, haz cada una bien hecha.',
     'Un día flojo no rompe nada. Mejor 25 minutos de la rutina que saltártela entera.'
   ];
@@ -467,25 +609,27 @@ const icoPlay = (s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fil
 function vCasa(){
   const nx=nextCasa().id;
   return `
-  <div class="top"><div class="date">Sin material · 50 minutos</div><h1>Rutinas en casa</h1></div>
+  <div class="top"><div class="date">Mancuernas y barra · unos 50 minutos</div><h1>Rutinas en casa</h1></div>
   <div class="card">
     <div class="row between"><span class="bold">Nivel de intensidad</span><span class="chip">${LV[S.settings.nivel].d}</span></div>
     <div class="seg" style="margin-top:12px">${[1,2,3].map(n=>`<button class="${+S.settings.nivel===n?'on':''}" onclick="setLevel(${n})">${n} · ${LV[n].t}</button>`).join('')}</div>
-    <p class="small muted" style="margin:10px 2px 0">La rutina dura lo mismo en cada nivel; cambia cuánto trabajas y cuánto descansas.</p>
+    <p class="small muted" style="margin:10px 2px 0">El nivel cambia cuánto trabajas y cuánto descansas. El peso lo eliges en cada rutina, por bloques.</p>
   </div>
   ${CASA.map(r=>`<button class="card rcard" onclick="openCasa('${r.id}')">
     <div class="row"><div class="letter">${r.id}</div><div class="grow">
       ${r.id===nx?'<div class="next">La siguiente</div>':''}
       <div class="bold" style="font-size:18px">${r.nombre}</div><div class="small muted">${r.sub} · ${Math.round(totalSec(buildCasa(r))/60)} min</div>
     </div><span class="muted">›</span></div>
+    <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><span class="chip">${EQ_TXT[r.eq]}</span>${r.saltos?'<span class="chip">Con saltos</span>':''}<span class="chip">${rutTxt(pesosRut(r))} kg</span></div>
     <div class="small muted" style="margin-top:10px">${r.bloques.flat().map(k=>EX[k].n).join(' · ')}</div>
   </button>`).join('')}
   <h2>Cómo funciona</h2>
   <div class="card">
     <div class="tip" style="margin-bottom:14px"><div class="ic">🔁</div><div class="small"><b>Rota A → B → C → D</b> los días que te venga bien. La app te dice cuál toca. Con 3-4 a la semana vas genial.</div></div>
-    <div class="tip" style="margin-bottom:14px"><div class="ic">⏱</div><div class="small"><b>Estructura:</b> 7 min de calentamiento, 4 bloques de 2 ejercicios alternados × 4 rondas (~36 min) y 7 min de core. Después, tus estiramientos.</div></div>
-    <div class="tip" style="margin-bottom:14px"><div class="ic">📈</div><div class="small"><b>Para progresar:</b> pasa a la variante difícil de un ejercicio cuando la normal te sobre, y sube de nivel cuando la rutina entera te parezca fácil (la app te avisa).</div></div>
-    <div class="tip"><div class="ic">🦵</div><div class="small"><b>Impacto:</b> A, B y C son de bajo impacto; la D mete saltos para subir pulsaciones. En los ejercicios a una pierna se alterna lado en cada ronda.</div></div>
+    <div class="tip" style="margin-bottom:14px"><div class="ic">⏱</div><div class="small"><b>Estructura:</b> 7 min de calentamiento, 1-2 min para montar el material y 1 min de series de aproximación, 4 bloques de 2 ejercicios alternados × 4 rondas y 7 min de core. Después, tus estiramientos.</div></div>
+    <div class="tip" style="margin-bottom:14px"><div class="ic">🏋️</div><div class="small"><b>Material:</b> A, B y D van con las dos mancuernas; la C, con la barra larga montada. Cada bloque usa un único peso para sus dos ejercicios, y en el minuto entre bloques cambias los discos: la app te dice cuáles poner en cada lado.</div></div>
+    <div class="tip" style="margin-bottom:14px"><div class="ic">📈</div><div class="small"><b>Para progresar:</b> al acabar cada sesión dices cómo te ha ido cada bloque. Si te sobra dos veces seguidas con el mismo peso, la app lo sube; si ya llevas todos los discos, pasa ese ejercicio a su versión difícil. Si te cuesta demasiado dos veces, baja. También puedes elegir tú la versión de cada ejercicio al abrir la rutina.</div></div>
+    <div class="tip"><div class="ic">🦵</div><div class="small"><b>Impacto:</b> A, B y C son de bajo impacto; la D mete saltos para subir pulsaciones. En los ejercicios a una pierna o a un brazo se alterna lado en cada ronda.</div></div>
   </div>`;
 }
 
@@ -536,6 +680,8 @@ function vProgreso(){
     <div class="row between"><span class="bold">Minutos por semana</span><span class="tiny muted row" style="gap:10px"><span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--casa)"></i> Casa</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--run)"></i> Correr</span></span></div>
     <svg class="chart" viewBox="0 0 ${W} ${H}" style="margin-top:10px">${bars}</svg>
   </div>
+  <h2>Cargas</h2>
+  ${cargasHTML()}
   <h2>Medidas</h2>
   <div class="card">
     ${bodyChart('cintura','Cintura','cm','var(--casa)')}
@@ -546,6 +692,27 @@ function vProgreso(){
   <h2>Historial</h2>
   <div class="card">${hist.length?(showAll?hist:hist.slice(0,12)).map(l=>itemHTML(l,true)).join(''):'<div class="empty">Aún no hay entrenos. ¡El primero es el que más cuenta!</div>'}
   ${hist.length>12&&!showAll?`<button class="btn block sm" style="margin-top:8px" onclick="vProgreso.all=1;render()">Ver todo (${hist.length})</button>`:''}</div>`;
+}
+function cargasHTML(){
+  const id=vProgreso.rut||nextCasa().id, r=CASA.find(x=>x.id===id);
+  const L=S.log.filter(l=>l.tipo==='casa'&&l.ref===id&&Array.isArray(l.pesos)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.ts||0)-(b.ts||0)).slice(-12);
+  const rows=r.bloques.map((b,i)=>{
+    const now=pesoBlk(r,i), ser=L.map(l=>arr(l.pesos[i])).filter(x=>x[0]!=null), first=ser[0];
+    const vv=b.map(k=>varOf(k)).find(v=>v);
+    let spark='';
+    if(ser.length>1){
+      const all=ser.flat(), mn=Math.min(...all), mx=Math.max(...all), rg=(mx-mn)||1, W=110,H=30;
+      const nl=Math.max(...ser.map(x=>x.length));
+      spark=`<svg viewBox="0 0 ${W} ${H}" style="width:110px;height:30px;flex:none">${Array.from({length:nl},(_,j)=>{const pts=ser.map((x,t)=>[4+t*(W-8)/(ser.length-1),4+(1-((x[j]??x[0])-mn)/rg)*(H-8)]);
+        return `<path d="${pts.map((q,t)=>(t?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ')}" fill="none" stroke="${j?'var(--z3)':'var(--casa)'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`}).join('')}</svg>`;
+    }
+    const diff=first?now.map((x,j)=>x-(first[j]??first[0])):[];
+    return `<div class="item"><div class="grow"><div class="t small">${i+1}. ${b.filter(k=>EX[k].w).map(k=>EX[k].n).join(' + ')}</div>
+      <div class="s">${blkTxt(now)} kg${diff.some(d=>d)?` · <b style="color:var(--run)">${diff.map(d=>(d>0?'+':'')+kgTxt(d)).join(' y ')} kg</b> desde el inicio`:''}${vv?` · ${VAR_TXT[vv].toLowerCase()}`:''}</div></div>${spark}</div>`;
+  }).join('');
+  return `<div class="card"><div class="seg sm">${CASA.map(c=>`<button class="${c.id===id?'on':''}" onclick="vProgreso.rut='${c.id}';render()">${c.id}</button>`).join('')}</div>
+  <div style="margin-top:6px">${rows}</div>
+  <p class="tiny muted" style="margin:8px 2px 0">${L.length?`${L.length} ${L.length===1?'sesión registrada':'sesiones registradas'} de la ${id}. Peso que toca ahora en cada bloque y cómo ha ido subiendo.`:`Aún no has registrado la ${id}. Aquí verás cómo suben tus cargas.`}</p></div>`;
 }
 function bodyChart(f,lbl,u,col){
   const pts=S.body.filter(b=>b[f]).sort((a,b)=>a.fecha.localeCompare(b.fecha));
@@ -559,7 +726,7 @@ function bodyChart(f,lbl,u,col){
 }
 function itemHTML(l,del){
   const isC=l.tipo==='casa';
-  const extra=[l.min?`${l.min} min`:'',l.km?`${l.km} km`:'',l.fc?`${l.fc} ppm`:'',l.rpe?`esfuerzo ${l.rpe}/10`:''].filter(Boolean).join(' · ');
+  const extra=[l.min?`${l.min} min`:'',l.km?`${l.km} km`:'',l.fc?`${l.fc} ppm`:'',l.rpe?`esfuerzo ${l.rpe}/10`:'',l.pesos?`${rutTxt(l.pesos)} kg`:''].filter(Boolean).join(' · ');
   return `<div class="item"><div class="badge ${isC?'casa':'run'}">${isC?(l.ref&&l.ref.length===1?l.ref:'C'):'🏃'}</div>
   <div class="grow"><div class="t">${esc(l.titulo)}</div><div class="s">${fmtShort(l.fecha)}${extra?' · '+extra:''}</div>${l.nota?`<div class="s" style="font-style:italic">“${esc(l.nota)}”</div>`:''}</div>
   ${del?`<button class="iconbtn" style="width:34px;height:34px" onclick="delLog('${l.id}')" aria-label="Borrar">✕</button>`:''}</div>`;
@@ -595,25 +762,38 @@ function vAjustes(){
     <div><label class="f">Carreras</label><select class="in" onchange="setS('objCorrer',+this.value)">${[1,2,3,4,5].map(n=>`<option ${+st.objCorrer===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
   </div>
   <div class="card">
+    <span class="bold">Tu material</span>
+    <p class="small muted" style="margin:6px 0 4px">2 barras cortas que se unen a una larga, y discos: 4 de 2 kg, 4 de 1,5 kg y 4 de 1,25 kg. La app solo te propone pesos que puedes montar.</p>
+    <div class="grid2"><div><label class="f">Cada barra corta (kg)</label><input class="in" type="number" step="0.1" inputmode="decimal" placeholder="0" value="${st.barraM||''}" onchange="setS('barraM',parseFloat(this.value.replace(',','.'))||0)"></div>
+    <div><label class="f">Barra larga montada (kg)</label><input class="in" type="number" step="0.1" inputmode="decimal" placeholder="0" value="${st.barraL||''}" onchange="setS('barraL',parseFloat(this.value.replace(',','.'))||0)"></div></div>
+    <p class="tiny muted" style="margin:8px 2px 0">Opcional: si pesas las barras, verás también el peso total con barra.</p>
+  </div>
+  <div class="card">
     <div class="row between" style="padding:4px 0"><span class="bold">Voz que te guía</span><label class="switch"><input type="checkbox" ${st.voz?'checked':''} onchange="setS('voz',this.checked)"><span></span></label></div>
     <div class="row between" style="padding:10px 0 4px"><span class="bold">Pitidos de cuenta atrás</span><label class="switch"><input type="checkbox" ${st.sonido?'checked':''} onchange="setS('sonido',this.checked)"><span></span></label></div>
   </div>
   <div class="card">
     <span class="bold">Tus datos</span>
-    <p class="small muted" style="margin:6px 0 12px">Se guardan solo en este móvil. Haz una copia de vez en cuando por si cambias de teléfono o borras el navegador.</p>
+    <p class="small muted" style="margin:6px 0 12px">Se guardan solo en este móvil. Haz una copia de vez en cuando por si cambias de teléfono o borras el navegador. ${S.lastBackup?'Última copia: '+new Date(S.lastBackup).toLocaleDateString('es-ES')+'.':'Aún no has hecho ninguna.'}</p>
     <div class="grid2"><button class="btn" onclick="exportData()">Exportar copia</button><button class="btn" onclick="$('#imp').click()">Importar copia</button></div>
     <input type="file" id="imp" accept="application/json,.json" class="hidden" onchange="importData(this.files[0])">
     <button class="btn danger block" style="margin-top:12px" onclick="resetAll()">Borrar todos los datos</button>
   </div>
-  <p class="tiny muted" style="text-align:center">Entrenos · v2</p>`;
+  <p class="tiny muted" style="text-align:center">Entrenos · v4</p>`;
 }
 function setS(k,v){ S.settings[k]=v; if(k==='custom'&&v&&!S.settings.zonas){ S.settings.zonas=zonasCalc(); } save(); render(); }
 function setR(i,v){ v=v.trim().replace('.',':'); if(!/^\d{1,2}:\d{2}$/.test(v)){ toast('Escríbelo como 6:30'); render(); return; } S.settings.ritmos=[...ritmos()]; S.settings.ritmos[i]=v; save(); toast('Ritmo guardado'); }
 function zonasCalc(){ const c=S.settings.custom; S.settings.custom=false; const z=zonas(); S.settings.custom=c; return z; }
 function setZ(i,j,v){ if(!S.settings.zonas) S.settings.zonas=zonasCalc(); S.settings.zonas[i][j]=+v; save(); }
-function exportData(){
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}); const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=`entrenos-copia-${today()}.json`; document.body.appendChild(a); a.click(); a.remove(); toast('Copia descargada');
+async function exportData(){
+  const name=`entrenos-copia-${today()}.json`, txt=JSON.stringify(S,null,2);
+  const mark=()=>{ S.lastBackup=Date.now(); S.backupSnooze=0; save(); render(); };
+  try{
+    const file=new File([txt],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'Copia de Entrenos'}); mark(); toast('Copia guardada'); return; }
+  }catch(e){ if(e&&e.name==='AbortError') return; }
+  const blob=new Blob([txt],{type:'application/json'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); mark(); toast('Copia descargada');
 }
 function importData(f){
   if(!f) return; const rd=new FileReader();
@@ -631,26 +811,28 @@ function resetAll(){ if(confirm('Se borrarán todos tus entrenos y medidas. ¿Se
 function openSheet(html){ $('#sheet').innerHTML='<div class="grab"></div>'+html; $('#sheetWrap').classList.remove('hidden'); document.body.style.overflow='hidden'; }
 function closeSheet(){ $('#sheetWrap').classList.add('hidden'); document.body.style.overflow=''; }
 
-function exHTML(k,extra=''){
+function exHTML(k,extra='',withVar=0){
   const e=EX[k];
   return `<div class="ex"><div class="n">${e.n}${extra?` <span class="chip" style="margin-left:4px">${extra}</span>`:''}${e.uni?' <span class="chip">alterna lado</span>':''}</div><div class="d">${e.d}</div>
-  ${e.f?`<div class="v"><b>Más fácil:</b> ${e.f}<br><b>Más difícil:</b> ${e.h}</div>`:''}</div>`;
+  ${e.f?`<div class="v"><b>Más fácil:</b> ${e.f}<br><b>Más difícil:</b> ${e.h}</div>${withVar?varSeg(k):''}`:''}</div>`;
 }
 function openCasa(id){
   const r=CASA.find(x=>x.id===id), lv=LV[S.settings.nivel];
-  openSheet(`<div class="row between"><div><div class="tiny muted bold">RUTINA ${r.id} · NIVEL ${S.settings.nivel} (${lv.d})</div><h3>${r.nombre}</h3><div class="small muted">${r.sub} · ${Math.round(totalSec(buildCasa(r))/60)} min</div></div><button class="iconbtn" onclick="closeSheet()">✕</button></div>
+  openSheet(`<div class="row between"><div><div class="tiny muted bold">RUTINA ${r.id} · NIVEL ${S.settings.nivel} (${lv.d})</div><h3>${r.nombre}</h3><div class="small muted">${r.sub} · ${EQ_TXT[r.eq]} · ${Math.round(totalSec(buildCasa(r))/60)} min</div></div><button class="iconbtn" onclick="closeSheet()">✕</button></div>
   <div class="blockt"><span>Calentamiento</span><span class="muted">7 × 1 min</span></div>
   <div class="small muted" style="padding:6px 0 4px">${WARM.map(k=>EX[k].n).join(' · ')}</div>
-  ${r.bloques.map((b,i)=>`<div class="blockt"><span>Bloque ${i+1}</span><span class="muted">4 rondas alternando · 1′ pausa al final</span></div>${b.map(k=>exHTML(k)).join('')}`).join('')}
+  <div class="small muted" style="padding:4px 0">Después, ${r.eq==='b'?'2 min para montar la barra larga':'1 min para montar las mancuernas'}. Luego, 30″ de aproximación por ejercicio del primer bloque. Los pesos son solo de discos, sin contar la barra.</div>
+  ${r.bloques.map((b,i)=>`<div class="blockt"><span>Bloque ${i+1}</span><span class="muted">4 rondas alternando · 1′ ${i<r.bloques.length-1?'para cambiar discos':'pausa al final'}</span></div>
+  <div class="row between" style="padding:8px 0 2px;align-items:flex-start;gap:10px"><span class="small bold" style="padding-top:9px">${MODO_TXT[modo(r,i)]}</span><div>${pesoSelect(r,i,true)}</div></div>
+  ${modo(r,i)==='solo'?'<div class="tiny muted">Este bloque usa una sola mancuerna, así que puedes cargarla con más discos (si te caben).</div>':''}
+  ${b.map(k=>exHTML(k, EX[k].one?'1 mancuerna':(EX[k].w?'':'sin peso'), 1)).join('')}`).join('')}
   <div class="blockt"><span>Core</span><span class="muted">40″ / 20″</span></div>
-  ${[...new Set(r.core.map(c=>c[0]))].map(k=>exHTML(k, r.core.filter(c=>c[0]===k).length>1?'cada lado':'')).join('')}
+  ${[...new Set(r.core.map(c=>c[0]))].map(k=>exHTML(k, r.core.filter(c=>c[0]===k).length>1?'cada lado':'', 1)).join('')}
   <div style="position:sticky;bottom:0;padding-top:14px;background:linear-gradient(transparent,var(--bg) 30%)"><button class="btn casa block" onclick="closeSheet();startCasa('${r.id}')">${icoPlay(16)} Empezar rutina ${r.id}</button>
   <button class="btn block" style="margin-top:8px" onclick="closeSheet();openLog({tipo:'casa',ref:'${r.id}'})">Registrar sin guía</button></div>`);
 }
 function openRun(id){
-  const s=RUN.find(x=>x.id===id), Z=zonas();
-  // agrupar repeticiones
-  const rows=[]; s.seg.forEach(([sec,z,l])=>{const last=rows[rows.length-1]; if(last&&last.l===l&&last.z===z&&last.sec===sec&&rows.length>1){last.n++} else rows.push({sec,z,l,n:1})});
+  const s=RUN.find(x=>x.id===id);
   openSheet(`<div class="row between"><div><div class="tiny muted bold">${s.plan?'TU PLAN · ENTRENO '+s.cod:'SESIÓN EXTRA'}</div><h3>${s.nombre}</h3><div class="small muted">${s.sub} · ${runMin(s)} min</div></div><button class="iconbtn" onclick="closeSheet()">✕</button></div>
   ${profileBar(s)}
   <div class="zones" style="margin-top:10px">${s.seg.map(([sec,zl,zh,l])=>{const r=rango(zl,zh);return `<div class="z"><div class="zb" style="background:${zc(zh)}">${ZL(zl,zh)}</div><div class="grow small">${l}<div class="tiny muted">${r.pace} min/km</div></div><div class="small muted bold" style="min-width:40px;text-align:right">${mmss(sec)}</div><div class="small bold" style="min-width:70px;text-align:right">${r.bpm}</div></div>`}).join('')}</div>
@@ -666,17 +848,35 @@ function openLog(pre={}){
   LOGF={tipo,ref,min:def,fecha:pre.fecha||today(),rpe:pre.rpe||6,km:'',fc:'',nota:'',fromPlayer:!!pre.fromPlayer,parcial:!!pre.parcial};
   drawLog();
 }
+function initLogCasa(){
+  const f=LOGF, rr=f.tipo==='casa'&&CASA.find(x=>x.id===f.ref);
+  if(!rr||!rr.eq||(f.snap&&f.snap.ref===f.ref)) return;
+  const p=pesosRut(rr); f.snap={ref:f.ref,pesos:p}; f.next=p.map(a=>[...a]); f.fb=p.map(()=>null); f.plan=p.map(()=>null);
+}
+function setFb(i,v){
+  const f=LOGF, rr=CASA.find(x=>x.id===f.ref), sc=$('#sheet').scrollTop;
+  document.querySelectorAll('#sheet textarea').forEach(t=>f.nota=t.value);
+  f.fb[i]=f.fb[i]===v?null:v; f.plan[i]=decide(rr,i,f.fb[i],f.snap.pesos[i]); f.next[i]=[...f.plan[i].next];
+  drawLog(); $('#sheet').scrollTop=sc;
+}
 function drawLog(){
+  initLogCasa();
   const f=LOGF, isC=f.tipo==='casa';
   const opts = isC ? [...CASA.map(r=>[r.id,`${r.id} · ${r.nombre}`]),['otra','Otra rutina']] : [['libre','Carrera libre (Z2)'],...RUN.map(r=>[r.id,(r.cod?r.cod+' · ':'')+r.nombre])];
   openSheet(`<div class="row between"><h3>${f.fromPlayer?'¡Sesión terminada! 🎉':'Registrar entreno'}</h3><button class="iconbtn" onclick="closeSheet()">✕</button></div>
   ${f.fromPlayer?`<p class="small muted" style="margin:2px 0 6px">${f.parcial?'Guardamos lo que has hecho, que también cuenta.':'Apunta cómo ha ido antes de estirar.'}</p>`:''}
   ${f.fromPlayer?'':`<div class="seg" style="margin-top:10px"><button class="${isC?'on':''}" onclick="LOGF.tipo='casa';LOGF.ref=nextCasa().id;LOGF.min=50;drawLog()">Casa</button><button class="${!isC?'on':''}" onclick="LOGF.tipo='correr';LOGF.ref='libre';LOGF.min=30;drawLog()">Correr</button></div>`}
-  <label class="f">Sesión</label><select class="in" onchange="LOGF.ref=this.value">${opts.map(([v,t])=>`<option value="${v}" ${v===f.ref?'selected':''}>${t}</option>`).join('')}</select>
+  <label class="f">Sesión</label><select class="in" onchange="LOGF.ref=this.value;drawLog()">${opts.map(([v,t])=>`<option value="${v}" ${v===f.ref?'selected':''}>${t}</option>`).join('')}</select>
   <div class="grid2"><div><label class="f">Fecha</label><input class="in" type="date" value="${f.fecha}" onchange="LOGF.fecha=this.value"></div>
   <div><label class="f">Minutos</label><input class="in" type="number" inputmode="numeric" value="${f.min}" onchange="LOGF.min=+this.value"></div></div>
   ${!isC?`<div class="grid2"><div><label class="f">Km (opcional)</label><input class="in" type="number" step="0.01" inputmode="decimal" placeholder="4,5" value="${f.km}" onchange="LOGF.km=this.value.replace(',','.')"></div>
   <div><label class="f">FC media (opcional)</label><input class="in" type="number" inputmode="numeric" placeholder="125" value="${f.fc}" onchange="LOGF.fc=this.value"></div></div>`:''}
+  ${(()=>{const rr=isC&&CASA.find(x=>x.id===f.ref); if(!rr||!rr.eq||!f.snap||f.snap.ref!==f.ref) return '';
+    return `<label class="f">¿Cómo te ha ido cada bloque?</label>${rr.bloques.map((b,i)=>{const pl=f.plan[i]; return `<div class="fbk">
+      <div class="small bold">${i+1}. ${b.map(k=>EX[k].n).join(' + ')} <span class="muted">· ${blkTxt(f.snap.pesos[i])} kg</span></div>
+      <div class="seg sm" style="margin-top:8px">${[[-1,'Me ha costado'],[0,'Bien'],[1,'Me ha sobrado']].map(([v,t])=>`<button class="${f.fb[i]===v?'on':''}" onclick="setFb(${i},${v})">${t}</button>`).join('')}</div>
+      <div class="row between" style="margin-top:8px;gap:10px;align-items:flex-start"><span class="tiny muted bold" style="padding-top:11px">PRÓXIMA VEZ</span><div>${pesoSelect(rr,i,false,f.next[i],j=>`LOGF.next[${i}][${j}]=+this.value`)}</div></div>
+      ${pl&&pl.hint?`<div class="tiny" style="margin-top:6px;color:var(--soft)">${pl.hint}</div>`:''}</div>`}).join('')}`})()}
   <label class="f">¿Cómo de duro ha sido? <span id="rpeT" style="color:var(--text)">${f.rpe} · ${RPE_TXT[f.rpe]}</span></label>
   <input type="range" min="1" max="10" value="${f.rpe}" style="accent-color:${isC?'var(--casa)':'var(--run)'}" oninput="LOGF.rpe=+this.value;$('#rpeT').textContent=this.value+' · '+RPE_TXT[this.value]">
   <label class="f">Notas (opcional)</label><textarea class="in" rows="2" placeholder="${isC?'p. ej. flexiones ya en el suelo':'p. ej. buenas sensaciones, algo de calor'}" onchange="LOGF.nota=this.value">${esc(f.nota)}</textarea>
@@ -690,11 +890,16 @@ function saveLog(){
   if(isC){ const r=CASA.find(x=>x.id===f.ref); titulo=r?`${r.nombre} · ${r.sub}`:'Rutina en casa'; }
   else { const s=RUN.find(x=>x.id===f.ref); titulo=s?(s.cod?s.cod+' · ':'')+s.nombre:'Carrera libre'; }
   const e={id:uid(),ts:Date.now(),fecha:f.fecha||today(),tipo:f.tipo,ref:f.ref,titulo,min:+f.min||0,rpe:+f.rpe,nota:f.nota.trim()};
-  if(isC) e.nivel=+S.settings.nivel;
+  if(isC){ e.nivel=+S.settings.nivel; const rr=CASA.find(x=>x.id===f.ref);
+    if(rr&&rr.eq&&f.snap&&f.snap.ref===f.ref){
+      e.pesos=f.snap.pesos; if(f.fb.some(x=>x!=null)) e.bloques=[...f.fb];
+      S.pesos=S.pesos||{}; S.pesos[rr.id]=f.next.map(a=>[...a]);
+      S.var=S.var||{}; f.plan.forEach(pl=>pl&&Object.assign(S.var,pl.vars));
+    } }
   if(!isC){ if(f.km) e.km=Math.round(parseFloat(f.km)*100)/100; if(f.fc) e.fc=+f.fc; }
   S.log.push(e);
-  if(isC){ const idx=CASA.findIndex(r=>r.id===f.ref); if(idx>=0) S.nextCasa=(idx+1)%CASA.length; }
-  save(); closeSheet(); render(); toast(isC?'Rutina guardada 💪':'Carrera guardada 🏃');
+  if(isC){ const idx=CASA.findIndex(r=>r.id===f.ref); if(idx>=0&&idx===(S.nextCasa||0)%CASA.length) S.nextCasa=(idx+1)%CASA.length; }
+  save(); closeSheet(); render(); toast(isC?'Rutina guardada 💪':(PLAN.some(p=>p.id===f.ref)?'Carrera guardada 🏃 · ya toca la siguiente':'Carrera guardada 🏃'));
 }
 function openBody(){
   const last=[...S.body].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0]||{};
@@ -734,7 +939,7 @@ async function keepAwake(){ try{ if('wakeLock' in navigator){ wakeLock=await nav
 document.addEventListener('visibilitychange',()=>{ if(P&&!P.paused&&document.visibilityState==='visible') keepAwake(); });
 
 function startCasa(id){ const r=CASA.find(x=>x.id===id); startPlayer({tipo:'casa',ref:id,titulo:r.nombre,ph:buildCasa(r),color:'var(--casa)'}); }
-function doneRun(id){ const s=RUN.find(x=>x.id===id); S.log.push({id:uid(),ts:Date.now(),fecha:today(),tipo:'correr',ref:id,titulo:(s.cod?s.cod+' · ':'')+s.nombre,min:runMin(s),nota:''}); save(); closeSheet(); render(); toast('Carrera hecha 🏃 · ya toca la siguiente'); }
+function doneRun(id){ closeSheet(); openLog({tipo:'correr',ref:id}); }
 function startPlayer(o){
   closeSheet();
   P={...o,i:0,paused:false,endAt:0,remain:o.ph[0].sec,doneSec:0,lastBeep:null,total:totalSec(o.ph)};
@@ -749,9 +954,11 @@ function phaseStart(first){
   const p=P.ph[P.i]; P.endAt=Date.now()+p.sec*1000; P.remain=p.sec; P.lastBeep=null;
   drawPlayer();
   if(!first) beep(1046,.25,.3);
-  const Z=zonas();
-  if(p.k==='work') say(`${EX[p.ex].n}${p.side?', '+p.side.toLowerCase():''}. ${p.sec} segundos.`);
+  if(p.k==='work'){ const v=varOf(p.ex); say(`${EX[p.ex].n}${v&&EX[p.ex].f?(v>0?', versión difícil':', versión fácil'):''}${p.side?', '+p.side.toLowerCase():''}. ${p.sec} segundos.`); }
+  else if(p.approx) say(`Serie de aproximación: ${EX[p.ex].n}. Pocas repeticiones, lentas, sin cansarte.`);
   else if(p.k==='warm') say(first?`Empezamos calentando. ${EX[p.ex].n}.`:EX[p.ex].n);
+  else if(p.k==='rest'&&p.setup!=null){ const rr=CASA.find(x=>x.id===P.ref), mt=montaje(rr,p.setup);
+    say(`${p.setup?'Cambia los discos':(rr.eq==='b'?'Monta la barra larga':'Monta las mancuernas')}. ${mt.voz.replace(/ \+ /g,', ')}.`); }
   else if(p.k==='rest'){ const n=nextWorkName(P.i); say(p.long?`Descanso de un minuto. ${n?'Siguiente bloque: '+EX[n.ex].n:''}`:`Descanso. Siguiente, ${n?EX[n.ex].n:''}`); }
   else if(p.k==='run'){ const r=rango(p.zl,p.zh); const mi=Math.floor(p.sec/60), se=p.sec%60;
     const dur=mi?`${mi} ${mi===1?'minuto':'minutos'}${se?' y '+se+' segundos':''}`:`${se} segundos`;
@@ -778,12 +985,17 @@ function updateClock(){
   const tl=$('#plLeft'); if(tl){ const left=P.total-P.doneSec-(p.sec-P.remain); tl.textContent=`Quedan ${mmss(left)}`; }
 }
 function drawPlayer(){
-  const p=P.ph[P.i], col=phaseColor(p), Z=zonas(), c=2*Math.PI*112;
+  const p=P.ph[P.i], col=phaseColor(p), c=2*Math.PI*112;
   const el=$('#player'); el.style.setProperty('--ph',col);
   let tag, name, sub='', body='';
   if(p.k==='run'){
     const r=rango(p.zl,p.zh); tag=`${ZL(p.zl,p.zh)} · ${ZN[p.zh]}`; name=p.title;
     body=`<div class="bpm">${r.bpm} <small>ppm</small></div><div class="pl-sub" style="font-size:17px">${r.pace} min/km</div>`;
+  } else if(p.k==='rest'&&p.setup!=null){
+    const rr=CASA.find(x=>x.id===P.ref), mt=montaje(rr,p.setup);
+    tag=p.setup?'Cambia los discos':(rr.eq==='b'?'Monta la barra':'Monta las mancuernas');
+    name=mt.name; sub=mt.sub;
+    body=`<div class="pl-cues">Bloque ${p.setup+1}: ${rr.bloques[p.setup].map(k=>EX[k].n).join(' + ')}${p.setup?'':(rr.eq==='b'?'<br>Une las barras cortas a la larga y aprieta bien los cierres.':'<br>Aprieta bien las roscas antes de empezar.')}</div>`;
   } else if(p.k==='rest'){
     const n=nextWorkName(P.i);
     tag=p.long?'Descanso largo':'Descansa'; name=n?`Prepárate: ${EX[n.ex].n}`:'Respira';
@@ -791,9 +1003,11 @@ function drawPlayer(){
     body=n?`<div class="pl-cues">${EX[n.ex].d}</div>`:'';
   } else {
     const e=EX[p.ex];
-    tag=p.k==='warm'?`Calentamiento ${p.info}`:(p.core?'Core':'¡Dale!'); name=e.n;
-    sub=[p.side?`Lado ${p.side.toLowerCase()}`:'',p.k==='work'?p.tag:''].filter(Boolean).join(' · ');
-    body=`<div class="pl-cues">${e.d}</div>${e.f?`<div class="pl-var" id="plVar"><button onclick="toggleVar()">Ver variantes</button></div>`:''}`;
+    tag=p.approx?'Serie de aproximación':p.k==='warm'?`Calentamiento ${p.info}`:(p.core?'Core':'¡Dale!'); name=e.n;
+    const rr=CASA.find(x=>x.id===P.ref), v=p.approx?0:varOf(p.ex);
+    sub=[p.blk!=null&&e.w&&rr?cargaTxt(rr,p.blk,p.ex):'',p.side?`Lado ${p.side.toLowerCase()}`:'',p.k==='work'?p.tag:''].filter(Boolean).join(' · ');
+    body=p.approx?`<div class="pl-cues">Pocas repeticiones, lentas y con buena técnica: es para preparar el cuerpo para el peso, no para cansarte.${e.uni?' Mitad del tiempo con cada lado.':''}</div>`
+      :`${v&&e.f?`<div class="pl-cues" style="margin-bottom:6px"><b style="color:var(--ph)">${VAR_TXT[v]}:</b> ${v>0?e.h:e.f}</div>`:''}<div class="pl-cues">${e.d}</div>${e.f?`<div class="pl-var" id="plVar"><button onclick="toggleVar()">Ver variantes</button></div>`:''}`;
   }
   // siguiente
   const nx=P.ph[P.i+1]; let nxt='Último tramo 💪';
@@ -871,6 +1085,7 @@ function finishPlayer(parcial){
 })();
 
 render();
+if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
 </script>
 </body>
 </html>
